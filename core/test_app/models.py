@@ -6,13 +6,14 @@ from django.db import models
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200, verbose_name='question text')
-    published_date = models.DateTimeField(verbose_name='date published', auto_now_add=True)
+    published_date = models.DateTimeField(verbose_name='date published')
 
     def __str__(self):
         return str(self.question_text)
 
     def was_published_recently(self):
-        return self.published_date > timezone.now() - datetime.timedelta(days=1)
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.published_date <= now
 
 
 class Choice(models.Model):

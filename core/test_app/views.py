@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView, DetailView
+from django.utils import timezone
 
 from .models import Question, Choice
 
@@ -19,7 +20,11 @@ class IndexView(ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        return Question.objects.order_by('-published_date')[:5]
+        """
+        return the last 5 published question (not including published in the future)
+        """
+
+        return Question.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')[:5]
 
 
 #def detail(request, question_id):
@@ -38,6 +43,12 @@ class DetailView(DetailView):
     model = Question
     context_object_name = 'question'
     template_name = 'test_app/detail.html'
+
+    def get_queryset(self):
+        """
+        Excluded any questions that aren't published yet
+        """
+        return Question.objects.filter(published_date__lte=timezone.now())
 
 
 #def result(request, question_id):
